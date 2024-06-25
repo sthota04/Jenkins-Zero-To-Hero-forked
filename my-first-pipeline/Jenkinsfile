@@ -1,40 +1,37 @@
 pipeline {
-    agent any
-    
+    agent {
+        docker {
+            image 'maven:3.8.3-openjdk-8' // Maven with JDK 8 Docker image
+            args '-v $HOME/.m2:/root/.m2' // Mount Maven local repository
+        }
+    }
+    environment {
+        MAVEN_HOME = '/usr/share/maven'
+        PATH = "$MAVEN_HOME/bin:$PATH"
+    }
     stages {
         stage('Build') {
             steps {
-                // Clean and build the Maven project
+                // Checkout the source code
+                checkout scm
+                
+                // Build the Maven project
                 sh 'mvn clean package'
             }
         }
-        
         stage('Run') {
             steps {
-                // Run the Java application (replace with your actual command)
-                sh 'java -jar target/your-artifact.jar'
+                // Run the Java application
+                sh 'java -cp target/hello-world-java-1.0-SNAPSHOT.jar com.example.App'
             }
         }
-        
-        stage('Deploy to Docker') {
-            steps {
-                // Build Docker image
-                script {
-                    docker.build('your-image-name:latest')
-                }
-                
-                // Push Docker image (optional step)
-                script {
-                    docker.withRegistry('https://registry.example.com', 'credentials-id') {
-                        docker.image('your-image-name:latest').push()
-                    }
-                }
-                
-                // Run Docker container
-                script {
-                    docker.run('your-image-name:latest')
-                }
-            }
+    }
+    post {
+        success {
+            echo 'Pipeline successfully executed!'
+        }
+        always {
+            // Clean up steps (if needed)
         }
     }
 }
