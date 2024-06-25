@@ -1,12 +1,40 @@
 pipeline {
-  agent {
-    docker { image 'node:16-alpine' }
-  }
-  stages {
-    stage('Test') {
-      steps {
-        sh 'node --version'
-      }
+    agent any
+    
+    stages {
+        stage('Build') {
+            steps {
+                // Clean and build the Maven project
+                sh 'mvn clean package'
+            }
+        }
+        
+        stage('Run') {
+            steps {
+                // Run the Java application (replace with your actual command)
+                sh 'java -jar target/your-artifact.jar'
+            }
+        }
+        
+        stage('Deploy to Docker') {
+            steps {
+                // Build Docker image
+                script {
+                    docker.build('your-image-name:latest')
+                }
+                
+                // Push Docker image (optional step)
+                script {
+                    docker.withRegistry('https://registry.example.com', 'credentials-id') {
+                        docker.image('your-image-name:latest').push()
+                    }
+                }
+                
+                // Run Docker container
+                script {
+                    docker.run('your-image-name:latest')
+                }
+            }
+        }
     }
-  }
 }
