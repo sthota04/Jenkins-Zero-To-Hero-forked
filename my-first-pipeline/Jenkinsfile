@@ -13,7 +13,7 @@ pipeline {
         stage('Build') {
             steps {
                 // Checkout the source code
-                checkout scm
+                // checkout scm
                 
                 // Build the Maven project
                 sh 'mvn clean package'
