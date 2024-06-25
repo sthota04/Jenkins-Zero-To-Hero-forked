@@ -30,8 +30,8 @@ pipeline {
         success {
             echo 'Pipeline successfully executed!'
         }
-        always {
+       // always {
             // Clean up steps (if needed)
-        }
+        //}
     }
 }
